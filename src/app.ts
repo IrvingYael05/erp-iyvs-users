@@ -7,6 +7,8 @@ import adminRoutes from "./routes/admin.routes";
 
 dotenv.config();
 
+console.log("Variables inyectadas por Railway:", Object.keys(process.env));
+
 const app: Application = express();
 const PORT = Number(process.env.PORT) || 3001;
 
