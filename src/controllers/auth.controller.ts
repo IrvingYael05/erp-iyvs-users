@@ -308,3 +308,73 @@ export const logout = async (req: Request, res: Response) => {
     });
   }
 };
+
+// ----- Restablecer Contraseña -----
+export const resetPassword = async (req: Request, res: Response) => {
+  const { newPassword } = req.body;
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({
+      statusCode: 401,
+      intOpCode: 1,
+      data: [{ message: "No se proporcionó un token de recuperación válido." }],
+    });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  const passwordRegex = /^.*[@$!%*?&#/\-+=<>].*$/;
+  if (newPassword.length < 10 || !passwordRegex.test(newPassword)) {
+    return res.status(400).json({
+      statusCode: 400,
+      intOpCode: 2,
+      data: [
+        {
+          message:
+            "La contraseña debe tener al menos 10 caracteres y un símbolo especial.",
+        },
+      ],
+    });
+  }
+
+  try {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser(token);
+
+    if (userError || !user) {
+      return res.status(401).json({
+        statusCode: 401,
+        intOpCode: 3,
+        data: [
+          { message: "El enlace de recuperación ha expirado o es inválido." },
+        ],
+      });
+    }
+
+    const { error: updateError } =
+      await supabaseAdmin.auth.admin.updateUserById(user.id, {
+        password: newPassword,
+      });
+
+    if (updateError) throw updateError;
+
+    return res.status(200).json({
+      statusCode: 200,
+      intOpCode: 0,
+      data: [
+        {
+          message: "Contraseña restablecida exitosamente.",
+        },
+      ],
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      statusCode: 500,
+      intOpCode: 99,
+      data: [{ message: "Error interno al restablecer la contraseña." }],
+    });
+  }
+};
