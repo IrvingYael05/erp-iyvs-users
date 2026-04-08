@@ -250,3 +250,37 @@ export const updatePassword = async (req: AuthRequest, res: Response) => {
     });
   }
 };
+
+// ----- Eliminar Cuenta Propia -----
+export const deleteMe = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.id;
+
+    const { data, error } = await supabaseAdmin.auth.admin.updateUserById(
+      userId,
+      {
+        ban_duration: "87600h",
+      },
+    );
+
+    if (error) {
+      return res.status(400).json({
+        statusCode: 400,
+        intOpCode: 1,
+        data: [{ message: "Error al intentar eliminar la cuenta." }],
+      } as ApiResponse);
+    }
+
+    return res.status(200).json({
+      statusCode: 200,
+      intOpCode: 0,
+      data: [{ message: "Cuenta eliminada correctamente." }],
+    } as ApiResponse);
+  } catch (err) {
+    return res.status(500).json({
+      statusCode: 500,
+      intOpCode: 99,
+      data: [{ message: "Error interno al intentar eliminar la cuenta." }],
+    });
+  }
+};

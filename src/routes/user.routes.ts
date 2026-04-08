@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  deleteMe,
   getMe,
   updateMe,
   updatePassword,
@@ -13,5 +14,6 @@ router.use(verifyToken);
 router.get("/me", getMe);
 router.put("/me", requirePermission("user:edit"), updateMe);
 router.put("/me/password", requirePermission("user:edit"), updatePassword);
+router.delete("/me", deleteMe);
 
 export default router;
