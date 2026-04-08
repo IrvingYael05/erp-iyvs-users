@@ -18,7 +18,8 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
       .select(
         "id, email, nombre_completo, direccion, telefono, fecha_nacimiento, permisos_globales, creado_en",
         { count: "exact" },
-      );
+      )
+      .eq("ban", false);
 
     if (search) {
       query = query.or(
@@ -293,6 +294,8 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
         ban_duration: "87600h",
       },
     );
+
+    await supabaseAdmin.from("usuarios").update({ ban: true }).eq("id", userId);
 
     if (error) {
       return res.status(400).json({

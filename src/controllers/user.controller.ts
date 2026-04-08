@@ -263,6 +263,8 @@ export const deleteMe = async (req: AuthRequest, res: Response) => {
       },
     );
 
+    await supabaseAdmin.from("usuarios").update({ ban: true }).eq("id", userId);
+
     if (error) {
       return res.status(400).json({
         statusCode: 400,
