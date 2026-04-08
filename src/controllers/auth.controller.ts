@@ -36,7 +36,9 @@ export const login = async (req: Request, res: Response) => {
 
     const { data: userData } = await supabase
       .from("usuarios")
-      .select("nombre_completo, permisos_globales")
+      .select(
+        "id, email, nombre_completo, direccion, telefono, fecha_nacimiento, permisos_globales",
+      )
       .eq("id", data.user.id)
       .single();
 
@@ -51,6 +53,9 @@ export const login = async (req: Request, res: Response) => {
             id: data.user.id,
             email: data.user.email,
             nombreCompleto: userData?.nombre_completo || "Usuario",
+            direccion: userData?.direccion || "",
+            telefono: userData?.telefono || "",
+            fechaNacimiento: userData?.fecha_nacimiento || "",
             permissions: userData?.permisos_globales || [],
           },
         },
