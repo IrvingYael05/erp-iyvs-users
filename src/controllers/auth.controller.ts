@@ -51,7 +51,7 @@ export const login = async (req: Request, res: Response) => {
             id: data.user.id,
             email: data.user.email,
             nombreCompleto: userData?.nombre_completo || "Usuario",
-            permission: userData?.permisos_globales || [],
+            permissions: userData?.permisos_globales || [],
           },
         },
       ],
