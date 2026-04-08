@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const SiteURL = process.env.SITE_URL;
+const SiteURL = process.env.SiteURL;
 
 // ----- Login -----
 export const login = async (req: Request, res: Response) => {
