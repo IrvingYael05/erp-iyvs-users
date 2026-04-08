@@ -8,16 +8,25 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
+    const search = req.query.search as string;
 
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
-    const { data, error, count } = await supabase
+    let query = supabase
       .from("usuarios")
       .select(
         "id, email, nombre_completo, direccion, telefono, fecha_nacimiento, permisos_globales, creado_en",
         { count: "exact" },
-      )
+      );
+
+    if (search) {
+      query = query.or(
+        `nombre_completo.ilike.%${search}%,email.ilike.%${search}%`,
+      );
+    }
+
+    const { data, error, count } = await query
       .order("creado_en", { ascending: false })
       .range(from, to);
 
@@ -52,11 +61,11 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
         },
       ],
     } as ApiResponse);
-  } catch (err) {
+  } catch (err: any) {
     return res.status(500).json({
       statusCode: 500,
       intOpCode: 99,
-      data: [{ message: "Error interno del servidor al obtener usuarios." }],
+      data: [{ message: "Error interno del servidor al consultar usuarios." }],
     } as ApiResponse);
   }
 };
