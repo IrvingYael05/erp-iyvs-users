@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
 import { supabase, supabaseAdmin } from "../config/supabase";
-import { ApiResponse } from "../interfaces/api-response";
-import { permission } from "node:process";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const SiteURL = process.env.SITE_URL;
 
 // ----- Login -----
 export const login = async (req: Request, res: Response) => {
@@ -211,7 +214,9 @@ export const recoverPassword = async (req: Request, res: Response) => {
   }
 
   try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: SiteURL + "/auth/reset",
+    });
 
     if (error) {
       const isUserExistsError =
