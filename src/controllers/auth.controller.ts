@@ -218,15 +218,36 @@ export const recoverPassword = async (req: Request, res: Response) => {
         error.message.toLowerCase().includes("not found") ||
         error.message.toLowerCase().includes("is invalid");
 
-      return res.status(400).json({
-        statusCode: 400,
-        intOpCode: 2,
-        data: [
-          {
-            message: isUserExistsError ? "El correo no está registrado o es inválido." : error.message,
-          },
-        ],
-      });
+      const isCurrentError =
+        error.message.toLowerCase().includes("security purposes") ||
+        error.message.toLowerCase().includes("seconds");
+
+      if (isCurrentError) {
+        return res.status(400).json({
+          statusCode: 400,
+          intOpCode: 2,
+          data: [
+            {
+              message: isCurrentError
+                ? "Por razones de seguridad, solo puedes solicitar un restablecimiento de contraseña cada cierto tiempo. Por favor, intenta nuevamente más tarde."
+                : error.message,
+            },
+          ],
+        });
+      }
+      if (isUserExistsError) {
+        return res.status(400).json({
+          statusCode: 400,
+          intOpCode: 2,
+          data: [
+            {
+              message: isUserExistsError
+                ? "El correo no está registrado o es inválido."
+                : error.message,
+            },
+          ],
+        });
+      }
     }
 
     return res.status(200).json({
